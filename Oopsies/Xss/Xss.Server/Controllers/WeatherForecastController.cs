@@ -23,7 +23,7 @@ namespace Xss.Server.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpGet("GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
@@ -35,7 +35,7 @@ namespace Xss.Server.Controllers
             .ToArray();
         }
 
-        [HttpGet(Name = "Search")]
+        [HttpGet("Search")]
         public IActionResult Search(string query)
         {
             // assume query is '<script>alert('XSS')</script>'
@@ -43,7 +43,7 @@ namespace Xss.Server.Controllers
             return new ContentResult() { Content = result };
         }
 
-        [HttpPost(Name = "UploadFile")]
+        [HttpPost("UploadFile")]
         public void SaveFile(IFormFile file)
         {
             string filePath = Path.Combine(@"C:\temp", file.FileName); //oef...
@@ -51,27 +51,28 @@ namespace Xss.Server.Controllers
             file.CopyTo(stream);
         }
 
-        [HttpPost(Name = "ExecuteCommand")]
+        [HttpPost("ExecuteCommand")]
         public void ExecuteCommand(string command)
         {
             Process.Start("cmd.exe", "/c " + command); //no no no
         }
 
-        [HttpPost(Name = "CallWebService")]
+        [HttpPost("CallWebService")]
         public void CallWebService(string url)
         {
             WebClient client = new WebClient();
             string response = client.DownloadString(url); //also no
         }
 
-        [HttpGet(Name = "ReDosMe")]
-        public bool ReDosMe(string input)
+        [HttpGet("ReDosMe")]
+        public ActionResult ReDosMe(string input)
         {
             const string pattern = "^[a-zA-Z0-9]*$";
-            return Regex.IsMatch(input, pattern);
+            var match = Regex.IsMatch(input, pattern);
+            return new OkResult();
         }
 
-        [HttpPost(Name = "Inject")]
+        [HttpPost("Inject")]
         public void InjectSomething(string code)
         {
             var method = new DynamicMethod("Run", typeof(void), null);
